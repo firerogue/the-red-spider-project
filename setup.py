@@ -126,15 +126,17 @@ def extend_user_env_windows (name, value, mode):
 def extend_user_env_posix (name, value, mode):
     '''NEVER call this function directly.
     Use the safer and platform-neutral 'extend_user_env' instead.'''
-    # It's sloppy to just append another export statement, but it
-    # works for the time being.
-    profile = open(expanduser('~/.profile'), 'a')
+    profile = open(expanduser("~/.bashrc"), 'a')
+    profiletext = open(expanduser("~/.bashrc"), 'r').read()
     if mode == 'a':
-        profile.write('\nexport {0}=${0}:{1}\n'.format(name, value))
+        if (not '\nexport {0}=${0}:{1}\n'.format(name, value) in profiletext):
+            profile.write('\nexport {0}=${0}:{1}\n'.format(name, value))
     elif mode == 'p':
-        profile.write('\nexport {0}={1}:${0}\n'.format(name, value))
+        if (not '\nexport {0}={1}:${0}\n'.format(name, value) in profiletext):
+            profile.write('\nexport {0}={1}:${0}\n'.format(name, value))
     else: # mode == 'o'
-        profile.write('\nexport {0}={1}\n'.format(name, value))
+        if (not '\nexport {0}={1}\n'.format(name, value) in profiletext):
+            profile.write('\nexport {0}={1}\n'.format(name, value))
     profile.close()
 
 def install ( ):
@@ -271,9 +273,10 @@ programs rely on.
 In addition the root has been saved to RED_SPIDER_ROOT, so after your
 next logon that one will be permanently available as well.
 
-Note for unixy systems: opening a new terminal window might count as a
-new logon. If you run me often, you may want to clean up ~/.profile
-once in a while..."""
+Note for unixy systems: opening a new terminal window will count as a
+new logon.  If you don't use your ~/.bashrc, then you will need to
+copy ~/.bashrc to ~/.profile.  If you don't know what that means,
+don't worry."""
 
 install_patience_msg = """
 Please wait while I install the rest..."""
