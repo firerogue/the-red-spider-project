@@ -126,7 +126,15 @@ def extend_user_env_windows (name, value, mode):
 def extend_user_env_posix (name, value, mode):
     '''NEVER call this function directly.
     Use the safer and platform-neutral 'extend_user_env' instead.'''
-    profile = open(expanduser("~/.bashrc"), 'a')
+    if exists(expanduser("~/.bashrc")):
+        envdir = raw_input(posix_env_msg.format("~/.bashrc")) or "~/.bashrc"
+    elif exists(expanduser("~/.zshrc")):
+        envdir = raw_input(posix_env_msg.format("~/.zshrc")) or "~/.zshrc"
+    elif exists(expanduser("~/.profile")):
+        envdir = raw_input(posix_env_msg.format("~/.profile")) or "~/.profile"
+    else:
+        envdir = raw_input(posix_env_dunno_msg) or "~/.profile"
+    profile = open(expanduser(envdir), 'a')
     profiletext = open(expanduser("~/.bashrc"), 'r').read()
     if mode == 'a':
         if (not '\nexport {0}=${0}:{1}\n'.format(name, value) in profiletext):
@@ -229,6 +237,18 @@ I'm guessing that {0}
 is the root directory of your copy of the Red Spider Project.
 
 If I'm wrong please enter the correct path, otherwise just hit enter.
+--> """
+
+posix_env_msg = """
+I think that {0} is your env file.
+Type the name of the file where you want to save your env.
+If you're not sure, just press enter, and I'll default to {0}.
+--> """
+
+posix_env_dunno_msg = """
+I dont't see any common env file locations.
+Where should I put the env file?
+If you just press enter, I'll use ~/.profile.
 --> """
 
 user_path_fail_msg = """
