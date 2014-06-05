@@ -148,8 +148,6 @@ def extend_user_env_posix (name, value, mode):
         if (not '\nexport {0}={1}\n'.format(name, value) in profiletext):
             profile.write('\nexport {0}={1}\n'.format(name, value))
 
-    if (not '\nexport PATH=$PATH:${0}\n'.format(name, value) in profiletext): # I can't think of a better way to do this... :(
-        profile.write('\nexport PATH=$PATH:${0}\n'.format(name, value))
     profile.close()
 
 def install ( ):
