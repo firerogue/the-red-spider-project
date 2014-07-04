@@ -153,6 +153,7 @@ def main ( ):
             user_path = raw_input(user_path_fail_msg.format(user_path))
     print(user_path_end_msg.format(user_path))
     
+    # fail if you don't have read/write access to the install location
     if not os.access(user_path, os.R_OK | os.W_OK):
         print(root_rw_fail_message)
         sys.exit(2)
@@ -202,29 +203,30 @@ def main ( ):
         # huzzah! rsshell installed!
         print(rsshell_install_success_msg.format(bin_file))
         
-        # TODO: REWRITTEN UP TO HERE
-        
+        # create other directories in the project
         for dir in (bin_dir, lib_dir, build_dir, cfg_dir, work_dir):
             if not os.path.exists(dir):
                 os.mkdir(dir)
+        
+        # make one long docfile in the config folder?
         docfile = open('config/doc.txt', 'w')
         for cmd in documented_cmds:
             docfile.write(cmd[0] + " " + cmd[1] + "\n")
-        # Installing from within Python works fine as long as we only need to copy
-        # some files, but this will become unmanageable if we also have to compile
-        # C++, Haskell, etcetera.
-        # So in the future the part below should be taken care of by some external
-        # build tool, called from here.
+        
+        # start installing modules
         print(install_patience_msg)
         if os.name == 'nt':  # Windows
             # if the program reaches this point, src_dir and bin_dir exist for sure
             for src_name, bin_name in zip(executable_scripts, executable_scripts):
+                # loop over all the source files and copy them over to the binary folder
                 src_file = os.path.join(src_dir, src_name)
-                if not os.path.exists(src_file):
+                if not os.path.exists(src_file): # if the source file isnt found, error
                     print(script_not_found_msg.format(src_name))
                 else:
+                    # copy over file
                     bin_file = os.path.join(bin_dir, bin_name)
                     shutil.copy2(src_file, bin_file)
+                    # make sure files are executabe
                     if not os.access(bin_file, os.X_OK):
                         from stat import *
                         os.chmod(bin_file,  S_IRUSR | S_IWUSR | S_IXUSR |
@@ -232,26 +234,28 @@ def main ( ):
         else:                # POSIX assumed
             # if the program reaches this point, src_dir and bin_dir exist for sure
             for src_name, bin_name in zip(executable_scripts, map(lambda x: os.path.splitext(x)[0], executable_scripts)):
+                # loop over the source files copying them to the binary folder without an extension
                 src_file = os.path.join(src_dir, src_name)
-                if not os.path.exists(src_file):
+                if not os.path.exists(src_file): # if the file isnt found
                     print(script_not_found_msg.format(src_name))
                 else:
+                    # copy file
                     bin_file = os.path.join(bin_dir, bin_name)
                     shutil.copy2(src_file, bin_file)
+                    # make sure files are executable
                     if not os.access(bin_file, os.X_OK):
                         from stat import *
                         os.chmod(bin_file,  S_IRUSR | S_IWUSR | S_IXUSR |
                                             S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH )
-        # if the program reaches this point, lib_dir exists for sure
         # ideally the modules in lib should be optimized, but we can fix that later
-        for module in python_modules:
+        for module in python_modules: # some messy stuff for compiled python modules
             dir, module_name = module.os.path.split('/')
             source_file = os.path.join(dir, module_name)
             # note: on Windows, os.path.join(dir, module_name) != module
-            if not os.path.exists(source_file):
+            if not os.path.exists(source_file): # check for module source
                 print(script_not_found_msg.format(source_file))
             else:
                 target_file = os.path.join(lib_dir, module_name + 'c')
                 py_compile.compile(source_file, target_file)
         # add more of such steps if that's feasible and no build system is available
-    print(farewell_msg)
+    print(farewell_msg) # done!
