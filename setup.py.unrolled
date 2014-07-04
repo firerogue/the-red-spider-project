@@ -153,44 +153,57 @@ def main ( ):
             user_path = raw_input(user_path_fail_msg.format(user_path))
     print(user_path_end_msg.format(user_path))
     
-    # TODO: REWRITEN UP TO HERE
-    
-    root_path = user_path
-    
-    if not os.access(root_path, os.R_OK | os.W_OK):
+    if not os.access(user_path, os.R_OK | os.W_OK):
         print(root_rw_fail_message)
         sys.exit(2)
-        
-    red_spider_root = root_path
+    
+    # huzzah! project root GET!
+    red_spider_root = user_path
+
+    # dafuq is this for???
     extend_user_env('RED_SPIDER_ROOT', red_spider_root, 'o')
+
+    # changing current working dir to the project root for some reason...
     os.chdir(red_spider_root)
     # existence of the build dir is the natural indicator of a previous install
     user_pref = raw_input(
         reinstall_choice_msg if os.path.exists(build_dir) else new_install_choice_msg
     )
-    if 'y' in user_pref or 'Y' in user_pref:
+    if 'y' in user_pref or 'Y' in user_pref: # (re)install!
         # invariant: RED_SPIDER_ROOT is the working directory and is read/writeable
-        if not os.path.exists(src_dir):
+        if not os.path.exists(src_dir): # expects source here
             print(no_src_panic_msg)
             sys.exit(1)
+        # idk
         fname = 'rsshell.py'
-        src_file = os.path.join(src_dir, fname)
-        if not os.path.exists(src_file):
+        src_file = os.path.join(src_dir, fname) # get path do shell file
+        if not os.path.exists(src_file): # if shell file doesnt exist, panic
             print(no_rsshell_warning_msg.format(os.path.join('src', fname)))
             return
         if os.name != 'nt':  # POSIX assumed
-            fname = os.path.splitext(fname)[0]
-        if not os.path.exists(extbin_dir):
+            fname = os.path.splitext(fname)[0] # set fname to rsshell?
+        
+        if not os.path.exists(extbin_dir): # this part happens on all OSes
             os.mkdir(extbin_dir)
             # assumption: if it doesn't exist it also isn't in the PATH
             extend_user_env('PATH', os.path.abspath(extbin_dir), 'a')
+        # copy file over
         bin_file = os.path.join(extbin_dir, fname)
         shutil.copy2(src_file, bin_file)
+        
+        # if windows and windows doesnt autolaunch python scripts from shell
         if os.name == 'nt' and '.py' not in os.getenv('PATHEXT'):
+            # create a simple batch command to run it for us! (in extbin)
+            # if windows does autolaunch python files we've taken care of this above
             fwd = open(os.path.splitext(bin_file)[0] + '.cmd', 'w')
             fwd.write(windows_rsshell_forward_script.format(os.path.abspath(bin_file)))
             fwd.close()
+        
+        # huzzah! rsshell installed!
         print(rsshell_install_success_msg.format(bin_file))
+        
+        # TODO: REWRITTEN UP TO HERE
+        
         for dir in (bin_dir, lib_dir, build_dir, cfg_dir, work_dir):
             if not os.path.exists(dir):
                 os.mkdir(dir)
