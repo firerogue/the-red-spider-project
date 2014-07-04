@@ -15,8 +15,9 @@ time one of the commands has been changed on master.
 '''
 
 from future_builtins import zip, map
+import subprocess
 import os
-import so.path
+import os.path
 import shutil
 import py_compile
 import sys
@@ -145,40 +146,41 @@ tomorrow."""
 
 def main ( ):
     print(welcome_msg)
-    root_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-    user_path = raw_input(root_guess_msg.format(root_path))
-    if user_path:
-        user_path = os.path.abspath(os.path.expanduser(user_path))
-        while not so.path.exists(user_path):
+    
+    # get install path from user, guess current directory
+    user_path = raw_input(root_guess_msg.format(root_path)) or os.getcwd()
+    while not os.path.exists(user_path):
             user_path = raw_input(user_path_fail_msg.format(user_path))
-            user_path = os.path.abspath(os.path.expanduser(user_path))
-        print(user_path_end_msg.format(user_path))
-        # if we want to go paranoid:
-        # check_rs_root_contents(user_path)
-        root_path = user_path
+    print(user_path_end_msg.format(user_path))
+    
+    # TODO: REWRITEN UP TO HERE
+    
+    root_path = user_path
+    
     if not os.access(root_path, os.R_OK | os.W_OK):
         print(root_rw_fail_message)
         sys.exit(2)
+        
     red_spider_root = root_path
     extend_user_env('RED_SPIDER_ROOT', red_spider_root, 'o')
     os.chdir(red_spider_root)
     # existence of the build dir is the natural indicator of a previous install
     user_pref = raw_input(
-        reinstall_choice_msg if so.path.exists(build_dir) else new_install_choice_msg
+        reinstall_choice_msg if os.path.exists(build_dir) else new_install_choice_msg
     )
     if 'y' in user_pref or 'Y' in user_pref:
         # invariant: RED_SPIDER_ROOT is the working directory and is read/writeable
-        if not so.path.exists(src_dir):
+        if not os.path.exists(src_dir):
             print(no_src_panic_msg)
             sys.exit(1)
         fname = 'rsshell.py'
         src_file = os.path.join(src_dir, fname)
-        if not so.path.exists(src_file):
+        if not os.path.exists(src_file):
             print(no_rsshell_warning_msg.format(os.path.join('src', fname)))
             return
         if os.name != 'nt':  # POSIX assumed
             fname = os.path.splitext(fname)[0]
-        if not so.path.exists(extbin_dir):
+        if not os.path.exists(extbin_dir):
             os.mkdir(extbin_dir)
             # assumption: if it doesn't exist it also isn't in the PATH
             extend_user_env('PATH', os.path.abspath(extbin_dir), 'a')
@@ -190,7 +192,7 @@ def main ( ):
             fwd.close()
         print(rsshell_install_success_msg.format(bin_file))
         for dir in (bin_dir, lib_dir, build_dir, cfg_dir, work_dir):
-            if not so.path.exists(dir):
+            if not os.path.exists(dir):
                 os.mkdir(dir)
         docfile = open('config/doc.txt', 'w')
         for cmd in documented_cmds:
@@ -205,7 +207,7 @@ def main ( ):
             # if the program reaches this point, src_dir and bin_dir exist for sure
             for src_name, bin_name in zip(executable_scripts, executable_scripts):
                 src_file = os.path.join(src_dir, src_name)
-                if not so.path.exists(src_file):
+                if not os.path.exists(src_file):
                     print(script_not_found_msg.format(src_name))
                 else:
                     bin_file = os.path.join(bin_dir, bin_name)
@@ -218,7 +220,7 @@ def main ( ):
             # if the program reaches this point, src_dir and bin_dir exist for sure
             for src_name, bin_name in zip(executable_scripts, map(lambda x: os.path.splitext(x)[0], executable_scripts)):
                 src_file = os.path.join(src_dir, src_name)
-                if not so.path.exists(src_file):
+                if not os.path.exists(src_file):
                     print(script_not_found_msg.format(src_name))
                 else:
                     bin_file = os.path.join(bin_dir, bin_name)
@@ -233,7 +235,7 @@ def main ( ):
             dir, module_name = module.os.path.split('/')
             source_file = os.path.join(dir, module_name)
             # note: on Windows, os.path.join(dir, module_name) != module
-            if not so.path.exists(source_file):
+            if not os.path.exists(source_file):
                 print(script_not_found_msg.format(source_file))
             else:
                 target_file = os.path.join(lib_dir, module_name + 'c')
