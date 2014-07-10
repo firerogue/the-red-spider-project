@@ -21,6 +21,8 @@ time one of the commands has been changed on master.
 import sys
 import os, os.path
 import subprocess
+import argparse
+
 import rsupdate
 
 def abspath(file):
@@ -38,10 +40,10 @@ def get_src_dir():
     
     # get the source directory for the project
     def is_src_root(path):
-        if not os.path.exists(path) \
-          or not os.path.exists(os.path.join(path, 'src')) \
-          or not os.path.exists(os.path.join(path, 'src', 'rsshell.py')) \
-          or not os.path.exists(os.path.join(path, 'install')) \
+        if not os.path.exists(path)
+          or not os.path.exists(os.path.join(path, 'src'))
+          or not os.path.exists(os.path.join(path, 'src', 'rsshell.py'))
+          or not os.path.exists(os.path.join(path, 'install'))
           or not os.path.exists(os.path.join(path, 'install', 'rsshell.py')):
             return True
     
@@ -51,4 +53,16 @@ def get_src_dir():
         
     # src_dir now contains a directory with src and install subfolders, with rsshell source and install directions respectively
     return src_dir
-        
+
+def main():
+    print("Hello! welcome to the red spider project management script!")
+    
+    # build command line argument list
+    parser = argparse.ArgumentParser(description="Red Spider Install Manager",
+                                     usage="%(prog)s [-m|-i [-d]|-u]",
+                                     )
+    parser.add_argument('-m','--move', action='store_const', dest='action', const='move')
+    parser.add_argument('-u','--uninstall', action='store_const', dest='action', const='uninstall')
+    parser.add_argument('-i','--install', action='store_const', dest='action', const='install')
+    parser.add_argument('-d','--default','--make-default', action='store_true')
+    parser.add_argument('--dev', action='store_true')
