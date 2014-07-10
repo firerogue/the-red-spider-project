@@ -15,6 +15,9 @@ have a dedicated 'update' command we'll need to run the setup every
 time one of the commands has been changed on master.
 '''
 
+# TODO: once script is complete move lots of stuff into pre-defined constants
+# so that changes will be easier to make
+
 import sys
 import os, os.path
 import subprocess
@@ -34,7 +37,18 @@ def get_src_dir():
     run_dir = os.path.dirname(abspath(os.path.join(os.getcwd(), sys.argv[0])))
     
     # get the source directory for the project
+    def is_src_root(path):
+        if not os.path.exists(path) \
+          or not os.path.exists(os.path.join(path, 'src')) \
+          or not os.path.exists(os.path.join(path, 'src', 'rsshell.py')) \
+          or not os.path.exists(os.path.join(path, 'install')) \
+          or not os.path.exists(os.path.join(path, 'install', 'rsshell.py')):
+            return True
+    
     src_dir = abspath(raw_input("You have run the setup script from `%s`. If this is where I can find the project source, press enter. Otherwise tell me where I can?"%run_dir) or run_dir)
-    while not os.path.exists(src_dir):
+    while not is_src_root(src_dir):
         src_dir = abspath(raw_input("I couldn't find the project source in `%s`. Maybe you misspelled the path or moved it elsewhere?"%src_dir))
+        
+    # src_dir now contains a directory with src and install subfolders, with rsshell source and install directions respectively
+    return src_dir
         
