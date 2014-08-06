@@ -97,16 +97,27 @@ def main():
     else: get_action()(args)
 
 def install(clargs):
-    ''' install is the "main" function in charge of creating a new install of the project.
+    ''' install is the "main" function in charge of creating a new installation of the project.
         clargs is the args object the command line parser returns, and is used as a starting point
         for the various flags and paths needed to install the red spider project '''
-        # TODO: write function body
-        # function calls:
-        # get_rsp_src_dir - obtain directory with project source
-        # get_install_dir - obtain the install destination
-        # is_global_install - system wide or single user install?
-        # gen_rc_file - generate the rsshell rc file
-        # set_default_root - set the default root in the rc file
-        pass
+    # TODO: write function body
+    # function calls:
+    # get_rsp_src_dir - obtain directory with project source
+    # get_install_dir - obtain the install destination
+    # is_global_install - system wide or single user install?
+    # gen_rc_file - generate the rsshell rc file
+    # set_default_root - set the default root in the rc file
+    pass
   
-  
+def uninstall(clargs):
+    ''' uninstall is the "main" function in charge of removing an old installation of the project.
+        clargs is the args object the command line parser returns, and is used as a starting point
+        for the various flags and paths needed to install the red spider project '''
+    # TODO: write function body
+    # function calls:
+    # get_rsp_dir - obtain root of installation to uninstall
+    # do_persist - should i keep rc settings for the install?
+    # for_each_file_do - delete all the files
+    # get_rsp_dir - obtain root of alternative default root
+    # set_default_root - set the default root in the rc file
+    pass
