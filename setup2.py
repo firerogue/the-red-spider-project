@@ -25,6 +25,28 @@ import argparse
 
 import rsupdate
 
+# List of all functions called by the 3 main functions and a bit about their innards
+# get_rsp_src_dir(cl_source=""): returns directory with project source, trying the clarg first. possibly just wrapper for get_dir()
+# get_install_dir(cl_dest=""): same as get_rsp_src_dir(), but for an empty folder to install into
+# get_default_pref(cl_default=""): possibly just a wrapper for some choice function. or replaced with a call to said choice function
+# is_global_install(cl_glob=""): see get_default_pref()
+# build_sys(build_dir, command): calls command ([dev]build|clean|config) for each file in the build directory
+# add_rc_block(name, rc_data, clash="break"): takes name of block, data, and collision response. break: throw an error, new: overwrite old with new on an item-by-item basis, old: ditto but reversed, clobber: overwrite whole block. also generates rc file if it doesnt exist yet
+# set_default_root(root): sets the default root as defined in the rc file
+# get_rsp_dir(cl_dir=""): same as get_rsp_src_dir() but for an install, not source
+# get_persist_pref(cl_persist=""): see get_default_pref()
+# for_each_file_do(root, command, fail, subs=True): do command for each file under root, recursively if subs. fail is the behaviour for a failed command(non-zero exit). break immediately? catalog all fails and return the list after? something else i havent thought of yet? maybe shouldnt be a function
+# get_dest_dir(cl_dest=""): identical to get_install_dir. probably a different prompt message
+# refactor_prog(root): some sort of function to go through root and correct any issues caused by moving an installation. maybe should take old root too?
+# read_rc_block(name): get the name data block in the rc file
+# remove_rc_block(name): delete the name data block in the rc file
+# update_rc_block(name, data): probably the same as add_rc_block with clash="new"
+### Note: the 4 *_rc_block functions might be imported from some other rc management script
+### Note: possible the way add_rc_block() generates new rc files is with a sub call to gen_rc().
+### Note: many of these functions suggest the existance of a get_dir() function that asks the same question over and over until a directory with given contents exists. args would probably be `msg, dir_contents, strict_contents`. msg being the thing to print, dir_contents a list of what needs to be found, and strict_contents a bool indicating if other things can also exist.
+
+
+
 def abspath(file):
     ''' returns an absolute path to file with homefolder are environment
         variables expanded, and without symlinks '''
@@ -107,6 +129,7 @@ def install(clargs):
     # get_install_dir - obtain the install destination
     # get_default_pref - set this as default installation? y/n
     # is_global_install - system wide or single user install?
+    # build_sys - calls the build system to actually do the install
     # add_rc_block - generate the rc stuff for this install, and whole file if first install
     # set_default_root - set the default root in the rc file
     pass
@@ -118,7 +141,7 @@ def uninstall(clargs):
     # TODO: write function body
     # function calls:
     # get_rsp_dir - obtain root of installation to uninstall
-    # do_persist - should i keep rc settings for the install?
+    # get_persist_pref - should i keep rc settings for the install?
     # for_each_file_do - delete all the files
     # get_rsp_dir - obtain root of alternative default root
     # set_default_root - set the default root in the rc file
@@ -130,7 +153,7 @@ def move(clargs):
         for the various flags and paths needed to move the red spider project '''
     # TODO: write function body
     # function calls:
-    # get_rse_dir - obtain root of installation to move
+    # get_rsp_dir - obtain root of installation to move
     # get_dest_dir - obtain dir to move root to
     # get_default_pref - set this as default installation? y/n
     # for_each_file_do - move all the files
