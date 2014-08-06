@@ -69,6 +69,7 @@ def main():
     # if more modes are added, they should get a command line option here
     # required: action='store_const', dest='action', and const=<function name>
     # the function is the mode's "main()" and accepts the parsed args object
+    ### brainstorm: maybe set const to a string with the function's name and pull from vars()?
     parser.add_argument('-m','--move', action='store_const', dest='action',
                         const=move, help="Move an installation from source to dest")
     parser.add_argument('-u','--uninstall', action='store_const', dest='action',
@@ -104,15 +105,16 @@ def install(clargs):
     # function calls:
     # get_rsp_src_dir - obtain directory with project source
     # get_install_dir - obtain the install destination
+    # get_default_pref - set this as default installation? y/n
     # is_global_install - system wide or single user install?
-    # gen_rc_file - generate the rsshell rc file
+    # add_rc_block - generate the rc stuff for this install, and whole file if first install
     # set_default_root - set the default root in the rc file
     pass
   
 def uninstall(clargs):
     ''' uninstall is the "main" function in charge of removing an old installation of the project.
         clargs is the args object the command line parser returns, and is used as a starting point
-        for the various flags and paths needed to install the red spider project '''
+        for the various flags and paths needed to uninstall the red spider project '''
     # TODO: write function body
     # function calls:
     # get_rsp_dir - obtain root of installation to uninstall
@@ -120,4 +122,26 @@ def uninstall(clargs):
     # for_each_file_do - delete all the files
     # get_rsp_dir - obtain root of alternative default root
     # set_default_root - set the default root in the rc file
+    pass
+
+def move(clargs):
+    ''' move is the "main" function in charge of migrating an installation of the project.
+        clargs is the args object the command line parser returns, and is used as a starting point
+        for the various flags and paths needed to move the red spider project '''
+    # TODO: write function body
+    # function calls:
+    # get_rse_dir - obtain root of installation to move
+    # get_dest_dir - obtain dir to move root to
+    # get_default_pref - set this as default installation? y/n
+    # for_each_file_do - move all the files
+    # refactor_prog - goes through new root and corrects anything broken by the move
+    # read_rc_block - get data about old install point from rc file
+    # remove_rc_block - delete data about old install point from rc file
+    # add_rc_block - reinsert the data for the new install point into rc file
+    ### Note: the last 3 functions maybe should just be a block of code
+    ### incentive for adding them is that together with update_rc_block they
+    ### could be used for a --update mode which would modify rc file data
+    ### alternatively, a separate script could be used for that. although even
+    ### then, we could include that script here and call the script's functions
+    ### from move()....
     pass
