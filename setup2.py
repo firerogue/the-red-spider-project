@@ -25,7 +25,7 @@ import os, os.path
 import subprocess
 import argparse
 
-import rsupdate
+import rsupdate # this is here because i intended to pull the installation functions from a separate update script eventually, so you dont have to run a full setup just to update your project. this is here as a reminder of that.
 
 # List of all functions called by the 3 main functions and a bit about their innards
 # [x] get_rsp_src_dir(cl_source=""): returns directory with project source, trying the clarg first. possibly just wrapper for get_dir()
