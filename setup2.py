@@ -35,7 +35,7 @@ import rsupdate # This is here because i intended to pull the installation funct
 # [ ] build_sys(build_dir, command): calls command ([dev]build|clean|config) for each file in the build directory
 # [ ] add_rc_block(name, rc_data, clash="break"): takes name of block, data, and collision response. break: throw an error, new: overwrite old with new on an item-by-item basis, old: ditto but reversed, clobber: overwrite whole block. also generates rc file if it doesnt exist yet
 # [ ] set_default_root(root): sets the default root as defined in the rc file
-# [ ] get_rsp_dir(cl_dir=""): same as get_rsp_src_dir() but for an install, not source
+# [ ] get_rsp_dir(cl_dir=""): same as get_rsp_src_dir() but for an install, not source. Maybe have rc file have a list of all installs, and check against that?
 # [ ] get_persist_pref(cl_persist=""): see get_default_pref()
 # [ ] for_each_file_do(root, command, fail, subs=True): do command for each file under root, recursively if subs. fail is the behaviour for a failed command(non-zero exit). break immediately? catalog all fails and return the list after? something else i havent thought of yet? maybe shouldnt be a function
 # [x] get_dest_dir(cl_dest=""): identical to get_install_dir. probably a different prompt message
