@@ -130,7 +130,7 @@ def main():
     
     # function to call gets stored here by the parser,
     # and it accepts the parsed args object as input
-    if 'action' in args and args['action'] in not None: args['action'](args)
+    if 'action' in args and args['action'] is not None: args['action'](args)
     # if the action wasn't given on the command line, get it interactively
     else: get_action()(args)
 
