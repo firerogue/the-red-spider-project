@@ -93,6 +93,17 @@ def get_dir(path, dir_contents, msg, strict=False):
     # we have a valid directory!
     return path
 
+def get_install_dir(cl_dest=""):
+    ''' Returns the directory into which the project should be installed'''
+    
+    # Initial attempt to find the directory. Checks command line arg first, then
+    # requests an empty directory
+    path = cl_dest or raw_input("Where should I install the project?")
+    
+    # Hand off to get_dir for the hard part.
+    return get_dir(path, [], "That folder isn't empty! Please give me an "+\
+      "empty one!", strict=True)
+
 def main():
     ''' main is in charge of reading command line arguments, discerning the run
         mode, and passing the command line args to the run mode's main function '''
