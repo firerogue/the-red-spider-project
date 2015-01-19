@@ -58,14 +58,14 @@ import rsupdate # this is here because i intended to pull the installation funct
 #    return nosym
 
 def get_rsp_src_dir(cl_source=""):
-    ''' returns the directory with the project's source '''
+    ''' Returns the directory with the project's source '''
     # find path the setup script is run from
     run_dir = os.path.dirname(os.path.join(os.getcwd(), sys.argv[0]))
     
     # initial attempt to find file. checks command line arg, then requests source
     # dir, with ability to default to the run directory
     ### Note: I do an extra half indent for continued lines. i admit this looks odd, and if anyone objects, feel free to change it.
-    path = src_arg or raw_input("You have run the setup script from `%s`."+\
+    path = cl_source or raw_input("You have run the setup script from `%s`."+\
       " If this is where I can find the project source, press enter."+\
       " Otherwise tell me where I can?"%run_dir) or run_dir
     
