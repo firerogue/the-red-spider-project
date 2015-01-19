@@ -16,20 +16,20 @@ time one of the commands has been changed on master.
 '''
 
 # TODO: 
-#   [ ] write all the functions
-#   [ ] move various stuff into constants to clean code (maybe)
-#   [ ] rearrange the functions so they appear in a useful manner in the source
+#   [ ] Write all the functions
+#   [ ] Move various stuff into constants to clean code (maybe)
+#   [ ] Rearrange the functions so they appear in a useful manner in the source
 
 import sys
 import os, os.path
 import subprocess
 import argparse
 
-import rsupdate # this is here because i intended to pull the installation functions from a separate update script eventually, so you dont have to run a full setup just to update your project. this is here as a reminder of that.
+import rsupdate # This is here because i intended to pull the installation functions from a separate update script eventually, so you dont have to run a full setup just to update your project. this is here as a reminder of that.
 
 # List of all functions called by the 3 main functions and a bit about their innards
 # [x] get_rsp_src_dir(cl_source=""): returns directory with project source, trying the clarg first. possibly just wrapper for get_dir()
-# [ ] get_install_dir(cl_dest=""): same as get_rsp_src_dir(), but for an empty folder to install into
+# [x] get_install_dir(cl_dest=""): same as get_rsp_src_dir(), but for an empty folder to install into
 # [ ] get_default_pref(cl_default=""): possibly just a wrapper for some choice function. or replaced with a call to said choice function
 # [ ] is_global_install(cl_glob=""): see get_default_pref()
 # [ ] build_sys(build_dir, command): calls command ([dev]build|clean|config) for each file in the build directory
@@ -38,7 +38,7 @@ import rsupdate # this is here because i intended to pull the installation funct
 # [ ] get_rsp_dir(cl_dir=""): same as get_rsp_src_dir() but for an install, not source
 # [ ] get_persist_pref(cl_persist=""): see get_default_pref()
 # [ ] for_each_file_do(root, command, fail, subs=True): do command for each file under root, recursively if subs. fail is the behaviour for a failed command(non-zero exit). break immediately? catalog all fails and return the list after? something else i havent thought of yet? maybe shouldnt be a function
-# [ ] get_dest_dir(cl_dest=""): identical to get_install_dir. probably a different prompt message
+# [x] get_dest_dir(cl_dest=""): identical to get_install_dir. probably a different prompt message
 # [ ] refactor_prog(root): some sort of function to go through root and correct any issues caused by moving an installation. maybe should take old root too?
 # [ ] read_rc_block(name): get the name data block in the rc file
 # [ ] remove_rc_block(name): delete the name data block in the rc file
@@ -48,7 +48,7 @@ import rsupdate # this is here because i intended to pull the installation funct
 ### [x] Note: many of these functions suggest the existance of a get_dir() function that asks the same question over and over until a directory with given contents exists. args would probably be `msg, dir_contents, strict_contents`. msg being the thing to print, dir_contents a list of what needs to be found, and strict_contents a bool indicating if other things can also exist.
 
 
-# not convinced this is neccessary, but leaving it here just in case
+# Not convinced this is neccessary, but leaving it here just in case
 #def abspath(file):
 #    ''' returns an absolute path to file with homefolder are environment
 #        variables expanded, and without symlinks '''
@@ -59,17 +59,18 @@ import rsupdate # this is here because i intended to pull the installation funct
 
 def get_rsp_src_dir(cl_source=""):
     ''' Returns the directory with the project's source '''
-    # find path the setup script is run from
+    
+    # Find path the setup script is run from
     run_dir = os.path.dirname(os.path.join(os.getcwd(), sys.argv[0]))
     
-    # initial attempt to find file. checks command line arg, then requests source
-    # dir, with ability to default to the run directory
-    ### Note: I do an extra half indent for continued lines. i admit this looks odd, and if anyone objects, feel free to change it.
+    # Initial attempt to find folder. Checks command line arg, then requests
+    # source dir, with the ability to default to the run directory
+    ### Note: I do an extra half indent for continued lines. I admit this looks odd, and if anyone objects, feel free to change it.
     path = cl_source or raw_input("You have run the setup script from `%s`."+\
       " If this is where I can find the project source, press enter."+\
       " Otherwise tell me where I can?"%run_dir) or run_dir
     
-    # now that we have an initial guess, hand off to get_dir for the hard part
+    # Now that we have an initial guess, hand off to get_dir for the hard part
     # and pass the result further up
     return get_dir(path, ['src','install'], "I couldn't find the project"+\
       " source in %(old_path)s. Maybe you misspeled the path or moved it elsewhere?")
@@ -79,22 +80,22 @@ def get_dir(path, dir_contents, msg, strict=False):
         strict is set), repeatedly asking msg until it gets a valid dir if path
         isn't one. msg may contain `%(old_path)s` to indicate that the last path
         should be inserted here in the string. '''
-        # TODO: maybe increase complexity for subcontents (dir contains foo/bar)
+        # TODO: Maybe increase complexity for subcontents (dir contains foo/bar)
         # if so, do we make strict a two-part variable for separate main and 
         # subfolder control?
-    # select the function to be used for contents check (identical/contains)
+    # Select the function to be used for contents check (identical/contains)
     check_f = set(dir_contents).__eq__ if strict else set(dir_contents).issubset
     
-    # contents check
+    # Contents check
     while not check_f(set(os.listdir(path)):
         # request new path
         path = raw_input(msg % {'old_path':path})
     
-    # we have a valid directory!
+    # We have a valid directory!
     return path
 
 def get_install_dir(cl_dest=""):
-    ''' Returns the directory into which the project should be installed'''
+    ''' Returns the directory into which the project should be installed.'''
     
     # Initial attempt to find the directory. Checks command line arg first, then
     # requests an empty directory
@@ -104,20 +105,34 @@ def get_install_dir(cl_dest=""):
     return get_dir(path, [], "That folder isn't empty! Please give me an "+\
       "empty one!", strict=True)
 
+def get_dest_dir(cl_dest=""):
+    ''' Returns the directory into which the project should be moved.'''
+    
+    # Initial attempt to find the directory. Checks command line arg first, then
+    # requests the directory with ability to default to the current directory
+    path = cl_dest or raw_input("Where should I move the project to? You are"+\
+      " running the script from %s. Press enter if I should move it here, or"+\
+      " another location if you'd prefer it there.") or os.getcwd()
+    
+    # Hand off to get_dir for the hard part
+    return get_dir(path, [], "That folder isn't empty! Please give me an "+\
+      "empty one!", strict=True)
+
 def main():
     ''' main is in charge of reading command line arguments, discerning the run
-        mode, and passing the command line args to the run mode's main function '''
+        mode, and passing the command line args to the run mode's main function. '''
+    
     print("Hello! welcome to the red spider project management script!")
     
-    # build command line argument list
+    # Build command line argument list
     parser = argparse.ArgumentParser(description="Red Spider Install Manager",
                                      usage="%(prog)s [-m|-i [-d]|-u]",
                                      epilog="These flags are provided for convenience. If left unsupplied, the program will request them during execution")
-    # mode args
-    # if more modes are added, they should get a command line option here
-    # required: action='store_const', dest='action', and const=<function name>
-    # the function is the mode's "main()" and accepts the parsed args object
-    ### brainstorm: maybe set const to a string with the function's name and pull from vars()?
+    # Mode args
+    # If more modes are added, they should get a command line option here
+    # Required: action='store_const', dest='action', and const=<function name>
+    # The function is the mode's "main()" and accepts the parsed args object
+    ### Brainstorm: maybe set const to a string with the function's name and pull from vars()?
     parser.add_argument('-m','--move', action='store_const', dest='action',
                         const=move, help="Move an installation from source to dest")
     parser.add_argument('-u','--uninstall', action='store_const', dest='action',
@@ -125,24 +140,24 @@ def main():
     parser.add_argument('-i','--install', action='store_const', dest='action',
                         const=install, help="Install the a copy of the project in source to dest")
     
-    # behaviour args
+    # Behaviour args
     parser.add_argument('-d','--default','--make-default', action='store_true',
                         help="For use with -m and -i. Makes the new project rsshell's default")
     parser.add_argument('--dev', action='store_true', help=argparse.SUPPRESS)
     
-    # location args
+    # Location args
     parser.add_argument('--source', metavar="folder", action='store',
                         help="The source folder. See -m,-u, and -i for usage")
     parser.add_argument('--dest','--destination', metavar="folder", action='store',
                         help="The Destination folder. Unused by -u. See -m, and -i for usage.")
     
-    # get command line args
+    # Get command line args
     args = parser.parse_args()
     
-    # function to call gets stored here by the parser,
+    # Function to call gets stored here by the parser,
     # and it accepts the parsed args object as input
     if 'action' in args and args['action'] is not None: args['action'](args)
-    # if the action wasn't given on the command line, get it interactively
+    # If the action wasn't given on the command line, get it interactively
     else: get_action()(args)
 
 def install(clargs):
@@ -187,10 +202,10 @@ def move(clargs):
     # read_rc_block - get data about old install point from rc file
     # remove_rc_block - delete data about old install point from rc file
     # add_rc_block - reinsert the data for the new install point into rc file
-    ### Note: the last 3 functions maybe should just be a block of code
-    ### incentive for adding them is that together with update_rc_block they
-    ### could be used for a --update mode which would modify rc file data
-    ### alternatively, a separate script could be used for that. although even
+    ### Note: the last 3 functions maybe should just be a block of code.
+    ### Incentive for adding them is that together with update_rc_block they
+    ### could be used for a --update mode which would modify rc file data.
+    ### Alternatively, a separate script could be used for that. Although even
     ### then, we could include that script here and call the script's functions
-    ### from move()....
+    ### from move()...
     pass
