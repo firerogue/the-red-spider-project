@@ -195,6 +195,11 @@ def install(clargs):
     # also happen around here
     if default:
         set_default_root(dest)
+    
+    # TODO: Make sure a copy of rsshell is in the user's bin folder, and whatever
+    # madness is supposed to happen on windows.
+    # Alternative idea: place a launch script instead that would call a specific
+    # install's own rsshell to allow multiple installs to use separate versions.
 
 def uninstall(clargs):
     ''' uninstall is the "main" function in charge of removing an old installation of the project.
