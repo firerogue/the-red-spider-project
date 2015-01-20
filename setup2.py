@@ -144,6 +144,7 @@ def main():
     # We need an negative option for this to differentiate between "no dont default" and "I'm not using the command line interface"
     parser.add_argument('-d','--default','--make-default', action='store_true',
                         help="For use with -m and -i. Makes the new project rsshell's default")
+    # Options should be included for the global option too. (It's worth noting I havent the slightest what its supposed to do.
     parser.add_argument('--dev', action='store_true', help=argparse.SUPPRESS)
     
     # Location args
