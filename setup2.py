@@ -141,6 +141,7 @@ def main():
                         const=install, help="Install the a copy of the project in source to dest")
     
     # Behaviour args
+    # We need an negative option for this to differentiate between "no dont default" and "I'm not using the command line interface"
     parser.add_argument('-d','--default','--make-default', action='store_true',
                         help="For use with -m and -i. Makes the new project rsshell's default")
     parser.add_argument('--dev', action='store_true', help=argparse.SUPPRESS)
@@ -164,17 +165,39 @@ def install(clargs):
     ''' install is the "main" function in charge of creating a new installation of the project.
         clargs is the args object the command line parser returns, and is used as a starting point
         for the various flags and paths needed to install the red spider project '''
-    # TODO: write function body
-    # function calls:
-    # get_rsp_src_dir - obtain directory with project source
-    # get_install_dir - obtain the install destination
-    # get_default_pref - set this as default installation? y/n
-    # is_global_install - system wide or single user install?
-    # build_sys - calls the build system to actually do the install
-    # add_rc_block - generate the rc stuff for this install, and whole file if first install
-    # set_default_root - set the default root in the rc file
-    pass
-  
+    
+    # Get options
+    source = get_rsp_src_dir(clargs.source)
+    # There should probably be some effort made to make sure dest is always the
+    # same if its pointing to the same location.
+    dest = get_install_dir(clargs.dest)
+    default = get_default_pref(clargs.default)
+    is_global = is_global_install(clargs.global)
+    
+    if source is not dest:
+        pass
+        # TODO: If the project is being installed into the folder it was unzipped into
+        # things become signifficantly simpler. In the case that it is not, certain
+        # things have to happen to allow for the successful construction of the project.
+    
+    # Install the thing!
+    build_sys(pass) # TODO: figure out how this function was intended to work
+    
+    # Currently, I'm not sure what data would go in the install's rc section
+    # but I'm leaving the function call in just in case
+    try:
+        add_rc_block(dest, data, clash="break")
+    except LookupError: # LookupError should maybe be replaced with a custom error?
+        print "Something has gone terribly wrong! There is already a section"+\
+          " in the rc file for this location! Please attempt to fix this and"+\
+          " then run the setup script again."
+          sys.exit()
+    
+    # If we decide to make the rc file aware of all installations, that should
+    # also happen around here
+    if default:
+        set_default_root(dest)
+
 def uninstall(clargs):
     ''' uninstall is the "main" function in charge of removing an old installation of the project.
         clargs is the args object the command line parser returns, and is used as a starting point
