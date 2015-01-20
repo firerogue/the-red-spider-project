@@ -31,7 +31,6 @@ import rsupdate # This is here because i intended to pull the installation funct
 # [x] get_rsp_src_dir(cl_source=""): returns directory with project source, trying the clarg first. possibly just wrapper for get_dir()
 # [x] get_install_dir(cl_dest=""): same as get_rsp_src_dir(), but for an empty folder to install into
 # [ ] get_default_pref(cl_default=""): possibly just a wrapper for some choice function. or replaced with a call to said choice function
-# [ ] is_global_install(cl_glob=""): see get_default_pref()
 # [ ] build_sys(build_dir, command): calls command ([dev]build|clean|config) for each file in the build directory
 # [ ] add_rc_block(name, rc_data, clash="break"): takes name of block, data, and collision response. break: throw an error, new: overwrite old with new on an item-by-item basis, old: ditto but reversed, clobber: overwrite whole block. also generates rc file if it doesnt exist yet
 # [ ] set_default_root(root): sets the default root as defined in the rc file
@@ -144,7 +143,6 @@ def main():
     # We need an negative option for this to differentiate between "no dont default" and "I'm not using the command line interface"
     parser.add_argument('-d','--default','--make-default', action='store_true',
                         help="For use with -m and -i. Makes the new project rsshell's default")
-    # Options should be included for the global option too. (It's worth noting I havent the slightest what its supposed to do.
     parser.add_argument('--dev', action='store_true', help=argparse.SUPPRESS)
     
     # Location args
@@ -173,7 +171,6 @@ def install(clargs):
     # same if its pointing to the same location.
     dest = get_install_dir(clargs.dest)
     default = get_default_pref(clargs.default)
-    is_global = is_global_install(clargs.global)
     
     if source is not dest:
         pass
